@@ -69,8 +69,12 @@ def get_can_data():
 
     
 
-can_interface = 'can0'
-bus = can.interface.Bus(can_interface, bustype='socketcan')
+can_interface = 'vcan0'
+if 'v' in can_interface:
+    bus = can.interface.Bus(can_interface, bustype='virtual')
+else:
+    bus = can.interface.Bus(can_interface, bustype='socketcan')
+bus.set_filters([key for key in MS_can_def.keys.keys()])
 reader = can.BufferedReader()
 listeners = [reader]
 notifier = can.Notifier(bus, listeners)
@@ -164,7 +168,7 @@ while running:
         if event.type == pygame.FINGERUP or event.type == pygame.MOUSEBUTTONUP:
             quitTimer=False
         pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_q]:
+        if pressed[pygame.K_q] or pressed[pygame.K_ESCAPE]:
                    running = False
         if pressed[pygame.K_UP]:
             gauge12.set_angle('temp',1)
@@ -173,12 +177,7 @@ while running:
         if pressed[pygame.K_LEFT]:
             gauge12.set_angle('oil',1)
         if pressed[pygame.K_RIGHT]:
-            gauge12.set_angle('oil',-1)
-        # if pressed[pygame.K_w]:
-        #     gauge2.set_angle(1)
-        # if pressed[pygame.K_s]:
-        #     gauge2.set_angle(-1) 
-            
+            gauge12.set_angle('oil',-1)            
 
             
     screen.fill((56, 56, 60))
